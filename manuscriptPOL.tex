@@ -54,12 +54,13 @@
 %% when authors are associated with multiple institutions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\author{Batuhan Kav}
 \author{Hanne Antila}
+\author{Batuhan Kav}
 \affiliation{Forschungszentrum Juelich, Germany}
 \email{batuhankav@gmail.com}
-\author{O. H. Samuli Ollila}
 \author{Markus S. Miettinen}
+\author{O. H. Samuli Ollila}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% The document title should be given as usual. Some journals require
 %% a running title from the author: this should be supplied as an
@@ -108,18 +109,24 @@
 %% Start the main part of the manuscript here.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-Conventional classical molecular dynamics (MD) simulations only consider electrostatics as interactions between static point charges, set by molecular dynamics models (force fields) as an input in the beginning of the simulation. The dynamic effects arising from polarizability are ignored or at most enter the simulations in an averaged fashion in the force field parametrization process. However, since decades work has been underway to make MD simulations explicitly polarizable in the hopes of reaching a more accurate description of the system. In the case of biomembranes (lipid bilayers), spesifically, including polarizability the molecular (dielectric) environment varies dramatically while crossing the membrane from the water phase across the dipolar/charged headgroup interface to the hydrophobic tail region and including explicit polarizability has the potential to provide more accurate description of membrane binding, membrane crossing, and behaviour and interactions of molecules residing within membranes, such as membrane protein folding. There certainly is room for improvement: efforts from the NMRlipids opens science community have showed that the current classical lipid models cannot correctly reproduce the conformational ensemble~\cite{}, conformational dynamics~\cite{}, or ion biding~\cite{} within the simulations. 
+Conventional classical molecular dynamics (MD) simulations only consider electrostatics as interactions between static point charges, set by molecular dynamics models (force fields) as an input in the beginning of the simulation. The dynamic effects arising from polarizability are ignored or at most enter the simulations in an averaged fashion in the force field parametrization process. However, since decades work~\cite{Thole1981,ando2001stable,Grossfield2003,
+lamoreux2003,Antila2013 ,Lemkul2016, baker2015polarizable,jing2019polarizable } has been underway to make MD simulations explicitly polarizable in the hopes of reaching a more accurate description of the system. 
 
-Historically, there has been three main approaches to modelling polarizability: 1) the induced point dipole/multipole model where polarizable point dipoles are placed on chosen sites on a molecule, 2) the classical Drude oscillator model where polarization is modelled by separating a core and a shell charge with a spring which stretches according to the enviroment giving the site a dipole moment, and 3) electronegativity equilization (fluctuating charge) model where atomic charges are no longer constant but can change according to the electronegativities of the molecule atoms and the electric fields from the molecular enviroment. In recent years the first two have surpassed the third in popularity. However, all of these approaches result in an increasing computational cost, e.g, by introducing new types of interactions, more interactions sites, or by requiring a shorter time step in the simulations.
+In the case of biomembranes (lipid bilayers), specifically, the molecular (dielectric) environment varies dramatically while crossing the membrane from the water phase across the dipolar/charged headgroup interface to the hydrophobic tail region. Including explicit polarizability in biomembrane modelling has the potential to provide more accurate description of membrane binding, membrane crossing, and behaviour and interactions of molecules residing within membranes, such as membrane protein folding. There certainly is room for improvement: efforts from the NMRlipids open science community have shown that the current non-polarizable lipid models cannot correctly reproduce the conformational ensemble~\cite{Botan2015,Antila2019}, conformational dynamics~\cite{Antila2021}, or ion biding~\cite{Catte2016} within MD simulations. 
+
+Historically, there has been three main approaches to modelling polarizability: 1) the induced point dipole/multipole model where polarizable point dipoles are placed on chosen sites on a molecule, 2) the classical Drude oscillator model where polarization is modelled by separating a core and a shell charge with a spring which stretches according to the enviroment giving the site a dipole moment, and 3) the electronegativity equilization (fluctuating charge) model where atomic charges are no longer constant but can change according to the electronegativities of the molecule atoms and the electric fields from the molecular enviroment. In recent years the first two have surpassed the third in popularity. However, all of these approaches result in an increasing computational cost, e.g, by introducing new types of interactions, more interactions sites, or by requiring a shorter time step in the simulations.
 
 
 %To avoid polarizability catastrophe where two closeby polarizable sites feed off from each other and the dipole moments grow infinitely
 
 
 
-Considering the increasing popularity of both implicitly and explicitly polarizable force fields and the increased computational computational cost that they require, systematic benchmark study polarizable force field quality is in high need. A few published studies reviewing the state of the polarizable force fields for biomolecules did not go beyond citing the results from the existing studies~\cite{inakollu2020polarisable,jin,baker2015polarizable}. Recent publications show that implicit inclusion of polarizability improves cation binding simulations when evaluated against NMR data~\cite{Melcr:2018a, melcr2019improved}. These results suggest that ion binding would be better captured in simulations with polarizable force fields. 
-At the moment, there are three main polarizable lipid force fields with explicit electronic polarization: CHARMM-Drude~\cite{li2017drude}, AMOEBA~\cite{chu2018anionicpolarizable,chu2018polarizable}, and CHARMM-Fluctuating Charge (FQ)~\cite{lucas2012charge}. 
-Here we evaluate the performance of two polarizable force fields with lipid parameters available, CHARMM-Drude~\cite{li2017drude} and AMOEBA~\cite{chu2018anionicpolarizable,chu2018polarizable}, against NMR data. We use NMR order parameters to evaluate  structural properties and cation binding, whereas NMR relaxation rates and correlation times are utilized to benchmark the lipid conformational dynamics. Furthermore, we compare the results to the non-polarizable simulations from the NMRlipids databanks.
+Considering the increasing popularity of both implicitly and explicitly polarizable force fields and the increased computational cost that they require, a systematic benchmark study on polarizable force field quality is in great need. The few published studies reviewing the state of polarizable force fields for biomolecule simulations did not go beyond citing results from the existing studies~\cite{inakollu2020polarisable,jing2019polarizable,baker2015polarizable}. Recent publications show that \textit{implicit} inclusion of polarizability improves cation binding simulations when evaluated against NMR data~\cite{Melcr:2018a, melcr2019improved}, which suggest that including polarization explicitly could result in better description of ion binding as well. 
+Currently, there are three main polarizable lipid force fields with explicit electronic polarization: CHARMM-Drude~\cite{li2017drude}, AMOEBA~\cite{chu2018anionicpolarizable,chu2018polarizable}, and CHARMM-Fluctuating Charge (FQ)~\cite{lucas2012charge}. 
+Here we evaluate the performance of two actively developed polarizable force fields with lipid parameters available, CHARMM-Drude~\cite{li2017drude} and AMOEBA~\cite{chu2018anionicpolarizable,chu2018polarizable}, against NMR data. We use NMR order parameters to evaluate  structural properties and cation binding, whereas NMR relaxation rates and correlation times are utilized to benchmark the lipid conformational dynamics. Small angle scattering (SAXS) data is used to estimate the description of electron density profile of the membrane. Furthermore, we compare the results to the best performing non-polarizable simulations from the NMRlipids Databank\cite{Databank}.
+
+
+This project has been performed within the NMRLipids collaboration (https://databank.nmrlipids.fi/)~\cite{Databank}. All simulation data, analysis scripts, and results are publicly available in their corresponding links. No plausible nor implausible request is required to download, use, and disseminate the data. 
 
 
 
@@ -128,7 +135,20 @@ Here we evaluate the performance of two polarizable force fields with lipid para
 
 \subsection{Evaluation of lipid bilayer properties simulated with polarizable force fields}
 
-\todo{Batuhan: Do we want to have a table showing the area per lipid, volume per lipid etc. type of values from these simulations?}
+We start by exploring the performance of polarizable force fields using the quality metrics developed in the NMRlipids Databank (https://databank.nmrlipids.fi/)~\cite{Databank}---a quality evaluated databank for lipid simulations. These metrics describe the ability of the models to reproduce the C-H NMR order parameters (quantifying the conformations) and the SAXS data (measuring the electron density variation across the membrane). For the former the molecule is divided into three parts, one containing the headgroup and the glycerol backbone carbons and one for each of the carbonyl tails, and the quality of each is evaluated separately. The quality metrics are summarized in Table~\ref{tab:my_label} and the performance of the force fields is visualized along with the underlying experimental measurables in Fig~\ref{fig:order_parameters}. 
+
+One can clearly see that the non-polarizable force fields, CHARMM36 and OPLS3e, outperform the polarizable force fields with respect to the NMR measurables for all parts of the molecule (higher $P$-values). For CHARMM-Drude force field, this is likely due to the headgroup and glycerol parametrization having been done targetting absolute average values of the order parameters instead of taking account the potential order parameter forking and order parameter sign~\cite{Antila2022}. The Amoeba force field reproduces the headgroup order parameters well [\todo{HANNE: refer to the hg flexibility? @Samuli, I didn't quite understand the argument? Refer there to the dihedral figure}] but clearly fails to depict the tail conformations, in particular in the double bond region (Fig.~\ref{fig:order_parameters}). In the tail regions, the CHARMM-Drude model is clearly better out of the two polarizable force fields. 
+
+The higher $FFq$ values (Table~\ref{tab:my_label}) of the polarizable force fields indicate that they are not able to reproduce the SAXS data as well as the best non-polarizable force fields. That said, CHARMM-Drude is as good as (POPC) or better (POPE) than its non-polarizable counterpart CHARMM36. AMOEBA, on the other hand, captures the SAXS profile of POPE very poorly (Table~\ref{tab:my_label} and Fig.~\ref{fig:order_parameters}D top). Note that the method for estimating the charge density of bilayers from the simulations places electrons as point charges at the atom centers in the system and does not consider any redistribution of charge density due to the polarizability. We expect this to results into a good estimate of the charge density.
+
+We proceed to quantify (Fig.~\ref{fig:correlation_times}) the structural dynamics of the polarizable models againts NMR $R_{1}$ rates, measuring a window of dynamics around $\sim$0.1-1~ns, and effective correlation times $\tau_{\mathrm{eff}}$ which quantifies a larger range of dynamical processes up to $\sim$1000~ns. We include the same measurables quantified from non-polarizable CHARMM36 and SLipids force fields, which are the best MD force fields regarding the dynamics~\cite{Antila2021}, as a point of comparison. The Amoeba force field captures the dynamics with respect to both measurables well,  in par with the best non-polarizable models. In contrast, the dynamics of CHARMM-Drude appears to be faulty in the fast range ($R_{1}$ rates) and, furthermore, $\tau_{\mathrm{eff}}$ values reveal vastly too slow overall dynamics. This indicates that not only are the simulations with this polarizable force field computationally costly but one would have to simulate longer to obtain converged results. Note that the experimental data here is from POPC. However, chemically identical the headgroup region the dynamics is assumed to be very similar in DOPC, due to the decoupling of the dynamics between the headgroup and the glycerol regions~\cite{Antila2022rot, Klauda08}.
+
+Finally, we address the premise that adding polarizability to force fields improves the depiction of ion binding to biomembranes in simulations. For this, we use the concept of "lipid electrometer"~\cite{Catte2016} where the amount of ion binding to the membrane can be quantified by the change in $\alpha$ and $\beta$ order parameters upon increasing salt concentration. These changes in order parameters are depicted in Fig.~\ref{fig:popc_order_parameter_change} whereas Fig.~\ref{fig:ion_density_profiles} gives the density profiles of ions with respect to the bilayer normal. The CHARMM36-Drude appears to have strong sodium binding, evidenced both by large change in the order parameters and the ion density profiles. The binding of monovalent sodium is, in fact, stronger than the divalent calcium. In strong contrast, experimentally one sees no sodium binding and some binding of calcium ions. 
+
+As opposed to the CHARMM36-Drude model, the order parameters of the AMOEBA model are almost completely unaffected by the ion addition, both for NaCl and CaCl$_{2}$. The ion density profiles confirm that very little ions penetrate the membrane region where the lipid phosphates reside. While this is in line with experiments regarding sodium ions, there should be some binding of calcium ions to the membrane. Again, the non-polarizable CHARMM36 appears to depict this calcium binding the best out of the models compared here.
+
+
+
 %\begin{figure}[!hbt]
 %	\centering
 %	\includegraphics{popc_order_parameters_nosalt.png}
@@ -153,11 +173,31 @@ Here we evaluate the performance of two polarizable force fields with lipid para
     \centering
     %\includegraphics{Figures/order_parameters.png}
     \includegraphics[width=\textwidth]{Figures/quality.pdf}
-    \caption{Order parameters calculated from the simulations}
+    \caption{X-ray scattering form factors, and C-H bond order parameters for headgroup and glycerol backbone, and acyl chains (from top to bottom) compared between simulations and experiments using the NMRlipids databank.}
     \label{fig:order_parameters}
-    \todo{Batuhan: Exp for DOPC?}
-    \todo{Batuhan: Charmm or any other simulation data for DOPC?}
+
 \end{figure}
+
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{c c c c c c c}
+        Lipid & Force field & $P^{\mathrm{headgroup}}$ & $P^{sn-1}$ & $P^{sn-2}$ & $FF_{q}$ & APL \\
+        \hline
+        POPC & OPLS3e       & 0.76 & 0.87 & 0.85 & 0.15 & 66.5\\
+        POPC & CHARMM36     & 0.70 & 0.54 & 0.69 & 1.16 & 65.0\\
+        POPC & CHARMM-Drude & 0.51 & 0.22 & 0.47 & 1.16 & 62.5\\
+        \hline
+        POPE & GROMOS-CKP & 0.29 & 0.83 & 0.48 & 0.40 & 59.6\\
+        POPE & CHARMM36   & 0.54 & 0.52 & 0.27 & 1.30 & 57.2 \\
+        POPE & CHARMM-Drude & 0.06 & 0.53 & 0.27 & 0.80 & 56.6  \\
+        POPE & AMOEBA & 0.21 & 0.10 & 0.23 & 3.80 & 66.9\\
+        \hline
+        DOPC & AMOEBA & 0.60 & 0.60 & 0.54 & - & 70.2\\
+    \end{tabular}
+    \caption{NMRlipids databank quality evaluations~\cite{Databank} and area per lipids compared between the best simulations found from the NMRlipids databank, simulations with CHARMM36 force field, and simulations with polarizable force fields. Experimental estimations for areas per lipid are POPC: 64.3$\pm1$\AA$^{2}$\cite{kucerka2011}, DOPC: 67.5$\pm1$\AA$^{2}$\cite{kucerka2008}, and POPE: 56.7$\pm$3\AA$^{2}$\cite{Rickeard2020}}
+    \label{tab:my_label}
+\end{table}
 
 %\begin{figure}[!hbt]
 %	\centering
@@ -172,23 +212,18 @@ Here we evaluate the performance of two polarizable force fields with lipid para
 
 \begin{figure}[!hbt]
 	\centering
-	\includegraphics{Figures/dihedral_distributions_no_salt.png}
-	\caption{The distributions of the torsion angles for the head group atoms without the presence of salt.}
+	\includegraphics{Figures/dihedral_distributions_without_ions.eps}
+	\caption{The distributions of the torsion angles for the head group atoms. For each torsion angle, the upper and lower rows contain the DOPC (AMOEBA) - POPC (Drude/Drude2023) and POPE lipids, respectively.}
 	\label{fig:dihedral_no_salt}
-        \todo{SAMULI: I am not sure if I see POPE CHARMM36 lines in this figure.
-          Also, colors, lines styles and/or widths could be better used to distinguish common and different elements in each line.
-        For example, CHARMM36 with thick lines, drude thin lines, POPC black, POPE red, or something like that.}
-        \todo{Batuhan: I'll fix the color scheme, add amoeba results, and move it to the SI section}
 \end{figure}
 
 \begin{figure}[!hbt]
 	\centering
-	\includegraphics{Figures/correlation_times.eps}
-	\caption{R1 times calculated for the POPC system. Experimental values are obtained from Ref.~\cite{antila2020quasi}}
+	\includegraphics{Figures/both_log.pdf}
+	\caption{Effective correlation times (top) and R$_1$ rates (bottom) for the polarizable models and best performing non-polarizable force fields. Note, top panel axis is logarithmic to visualize the slow CHARMM-drude dynamics. Experimental values are obtained from Ref.~\citenum{Antila2022rot}. All simulations used here were salt free.}
 	\label{fig:correlation_times}
-        \todo{SAMULI: Are ''No Salt'' and all ion containing systems from Drude? Is it really true that addition of any salt increases the
-        values to the same independently on the amount?}
-        \todo{HANNE: are you going to add the teffs? You got the lower limit out of them right? Or maybe we can just mention that the correlation times were super slow which compounds to the already heavy computational load (one needs to simulate even longer to get convergence) }
+
+
 \end{figure}
 
 \clearpage
@@ -207,28 +242,28 @@ Here we evaluate the performance of two polarizable force fields with lipid para
 \begin{figure}[!hbt]
 	\centering
 	\includegraphics{Figures/order_parameter_change.png}
-	\caption{The change in the head group order parameters with respect to the simulations without salt as a function of the salt concentration.}
+	\caption{The change in the lipid head group order parameters $\beta$ (top row) $\alpha$ (bottom row) upon increasing ion concentration with respect to the simulations without salt. }
 	\label{fig:popc_order_parameter_change}
-        \todo{SAMULI: y-axis scale should be much more zoomed in here, particularly the difference in experiments between sodium and calcium must be visible.} \\
-        \todo{SAMULI: We should also show the ion density profiles along membrane normal and compare the ones with 1000 mM NaCl and 350 mM CaCl$_2$
-          (concentration in bulk water) to the best profiles in the literature (Fig. 5 in http://dx.doi.org/10.1021/acs.jpcb.7b12510).
-          This will show the actual difference in ion binding to the best performing models available.}
 \end{figure}
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics{Figures/ion_density_profiles_with_chloride.png}
-    \caption{Density profiles alongside the membrane normal for the Drude POPC (first row) and AMOEBA DOPC (second row). Solid and dashed lines are for the systems with the NaCl and CaCl$_{2}$, respectively.}
+    \includegraphics{Figures/ion_density_profiles_with_chloride.eps}
+    \caption{Density profiles along the membrane normal for the Drude 2017 and 2023 POPC (first and second rows) and AMOEBA DOPC (third row). Solid and dashed lines are for the systems with the NaCl and CaCl$_{2}$, respectively.}
     \label{fig:ion_density_profiles}
+            \todo{SAMULI: We should also show the ion density profiles along membrane normal and compare the ones with 1000 mM NaCl and 350 mM CaCl$_2$
+          (concentration in bulk water) to the best profiles in the literature (Fig. 5 in http://dx.doi.org/10.1021/acs.jpcb.7b12510).
+          This will show the actual difference in ion binding to the best performing models available.}
+          \todo{Batuhan: Data generated from http://dx.doi.org/10.1021/acs.jpcb.7b12510}
 \end{figure}
 
 
 \clearpage
 
-\subsection{Discussion}
+%\subsection{Discussion}
 
 \subsection{Conclusions}
-
+After comparing the polarizable lipid models against high-resolution experimental data and the best performing non-polarizable force fields, we cannot confirm that adding polarizablity to the force fields has yet solved many of the issues it was hoped to address. Ion binding to the model membrane seems to be overestimated by the CHARMM36-Drude model, whereas the calcium binding is underestimated by the Amoeba force field. The electron density profiles of the bilayers appear to be better reproduced by the best non-polarizable force fields, within the confines of the approximations used to calculate them from the trajectory. Same applies for the dynamics and conformational sampling of the models, although the Amoeba force field produces results, spesifically in the headgroup region of PC lipids, that are in par or better than the best non-polarizable force fields with respect to these measurables. In summary, polarizable models appear still to be in their infancy, and added complexity of polarizability has not still realised its potential to the fullest; The non-polarizable force fields with longer and more intense refinement behind them still outpeform. Considering the complexity and cost of using these models, polarizability should be parameterized with more thorough consideration to the experimental benchmarks.
 
 \section{Methods}
 \subsection{Practical pitfalls of polarizable biomembrane simulations}
@@ -236,11 +271,11 @@ Here we evaluate the performance of two polarizable force fields with lipid para
 
 \subsubsection{Building a polarizable force field}
 
-The atomic point charges describing the electrostatics in non-polarizable force fields are typically parameterized by fitting to the electrostatic potential energy surface around one or few conformers obtained from ab initio calculations. One then proceeds to build on top of that the parameters for Lennard-Jones interactions and the dihedrals using a mixture of experimental (such as heats of vaporizations) and quantum mechanical information. For a polarizable force fields, this process has to be redone as in the first step the polarizable contribution has to be separated from the "static" one. Furthermore, for the polarization models considered here, an additional cutoff/damping scheme needs to be introduced to prevent polarization catastrophe---a phenomenon where close-by dipoles feed of each others and their dipole moments (and energy) grows into infinity.
+The atomic point charges describing the electrostatics in non-polarizable force fields are typically parameterized by fitting to the electrostatic potential energy surface around one or few conformers obtained from ab initio calculations. One then proceeds to build on top of that the parameters for Lennard-Jones interactions and the dihedrals using a mixture of experimental (such as heats of vaporizations) and quantum mechanical information. For a polarizable force fields, this process has to be redone as in the first step the polarizable contribution has to be separated from the "static" one. Furthermore, for the polarization models considered here, an additional cutoff/damping scheme needs to be introduced to prevent polarization catastrophe~\cite{Thole1981}---a phenomenon where close-by dipoles feed of each others and their dipole moments (and energy) grows into infinity.
 
-Both polarizable lipid force fields considered here use a bottom up approach where parameters are first obtained for smaller molecules or molecular fragments from which the lipid models are then built.  In the CHARMM-Drude model, the polarizabilities, the Thole damping factors used to prevent polarization catastrophe, and the partial charges where determined by fitting to a discretized QM potential energy surface around the molecule. More spesifically, the pertubations of the potential energy surface in the presence of a small charge where observed to separate the dynamic polarizability contribution. They then proceeded to use enthalpies of vaporation along with QM calculations of molecular interaction enegies to obtain the Lennard-Jones parameters, and on top of that dihedral potentials were introduced to reproduce the QM potential energy profiles along a dihedral rotation. Finally, the dihedrals of the lipid head groups where refined targetting the NMR order parameters.
+Both polarizable lipid force fields considered here use a bottom up approach where parameters are first obtained for smaller molecules or molecular fragments from which the lipid models are then built.  In the CHARMM-Drude model, the polarizabilities, the Thole damping factors used to prevent polarization catastrophe, and the partial charges where determined by fitting to a discretized QM potential energy surface around the molecule. More specifically, the perturbations of the potential energy surface in the presence of a small charge where observed to separate the dynamic polarizability contribution. They then proceeded to use enthalpies of vaporation along with QM calculations of molecular interaction energies to obtain the Lennard-Jones parameters, and on top of that dihedral potentials were introduced to reproduce the QM potential energy profiles along a dihedral rotation. Finally, the dihedrals of the lipid head groups where refined targetting the NMR order parameters.
 
-In the Amoeba force field, a set of atomic multipoles were first obtained based on the QM electron densities using Stone's distributed multipole analysis. The atoms were then assigned polarizabilities according to the AMOEBA atom types and   induced dipole contribution was self consistently substracted from the permanent dipoles~\cite{shi2013proteinamoeba}. The charges (monopoles) were then kept constant while the multipoles were refined against the electrostatic potential energy surface around few conformers of the molecular fragments. %Multipoles are allowed to induce only dipoles at polarizable sites outside their immediate environment (polarization group). 
+In the Amoeba force field, a set of atomic multipoles were first obtained based on the QM electron densities using Stone's distributed multipole analysis~\cite{Stone1981}. The atoms were then assigned polarizabilities according to the AMOEBA atom types and induced dipole contribution was self consistently subtracted from the permanent dipoles~\cite{shi2013proteinamoeba}. The charges (monopoles) were then kept constant while the multipoles were refined against the electrostatic potential energy surface around few conformers of the molecular fragments. %Multipoles are allowed to induce only dipoles at polarizable sites outside their immediate environment (polarization group). 
 After electrostatic parameters were set, the Lennard-Jones parameters were taken from previous AMOEBA parameterizations of smaller molecules containing same functional groups~\cite{Ren2011polorganic,shi2011hydration}, and then refined against molecule - water (gas phase) interaction energies. After settling all the nonbonded parameters, dihedral potentials were parameterised based on the QM conformational energy profiles.
 
 \begin{comment}
@@ -264,8 +299,10 @@ Notes on Amoeba parametrization (this is NOT well explained in the paper)
 \end{comment}
 \subsubsection{Using a polarizable force field}
 
-The increased level of detail portrayed by explicit treatment of electronic polarizability comes with certain costs. The first cost is the increased computational complexity reduces the simulation speed. For the Drude force field, this slowdown occurs both because the addition of the Drude particles increases the number of interaction pairs and the employed extended dual-Langevin thermostat requires 1~fs integration time step. Current AMOEBA force field can use a multi time-step integration algorithm where the non-electronic interactions are iterated with a 2~fs time step whereas more computationally unstable polarization terms are iterated with a smaller time step. Yet, this usage of a multi-time step integration scheme does not overcome the slowdown resulting from the computationally demanding polarization calculations. As a result, one experiences almost a ten-fold decrease in the simulation speed while using the polarizable force fields. The second cost is due to the limited software support for both running and analyzing the simulations. Currently only OpenMM supports both AMOEBA and Drude force fields. NAMD can only run the Drude force field whereas TINKER is only valid for AMOEBA force field and it does not support semi-isotropic pressure coupling, which decouples the pressure tensor in $xy$ and $z$-direction and is crucial for correctly evaluating the ion binding properties of the bilayers (\todo{This needs a reference, I remember Samuli mentioning this during a chat}). On the other hand, GROMACS, which has been the most popular MD engine within the bilayer simulation field, does not support any polarizable force field simulations. This is particularly important, as GROMACS also comes with many built-in functions for analyzing the trajectories and many of these functions require a GROMACS tpr file and subsequently cannot be utilized for analyzing the trajectories generated by other MD engines. This hinders the researchers from using well-tested analysis tools creating an overhead during the trajectory analysis while making results more prone to error. Therefore, open-source Python libraries for trajectory analysis like MDAnalysis, MDtraj, and LiPhyphilic (based on MDAnalysis) that can work on multiple trajectory and topology formats are gaining more attention.
-
+The increased level of detail portrayed by explicit treatment of electronic polarizability comes with certain costs. The first cost is the increased computational complexity reduces the simulation speed. For the Drude force field, this slowdown occurs both because the addition of the Drude particles increases the number of interaction pairs and the employed extended dual-Langevin thermostat requires 1~fs integration time step. Current AMOEBA force field can use a multi time-step integration algorithm where the non-electronic interactions are iterated with a 2~fs time step whereas more computationally unstable polarization terms are iterated with a smaller time step. Yet, this usage of a multi-time step integration scheme does not overcome the slowdown resulting from the computationally demanding polarization calculations. As a result, one experiences almost a ten-fold decrease in the simulation speed while using the polarizable force fields. The second cost is due to the limited software support for both running and analyzing the simulations. Currently only OpenMM supports both AMOEBA and Drude force fields. NAMD can only run the Drude force field whereas TINKER is only compatible with AMOEBA force field and does not support semi-isotropic pressure coupling, which decouples the pressure tensor in $xy$ and $z$-direction and is crucial for correctly evaluating the ion binding properties of the bilayers (\todo{This needs a reference, I remember Samuli mentioning this during a chat}). On the other hand, GROMACS, which has been the most popular MD engine within the bilayer simulation field, only has limited support for the Drude polarizable force field via an unofficial git-branch [https://github.com/gromacs/gromacs/tree/drude] but does not support AMOEBA at all.
+\begin{comment}
+This is particularly important, as GROMACS also comes with many built-in functions for analyzing the trajectories and many of these functions require a GROMACS tpr file and subsequently cannot be utilized for analyzing the trajectories generated by other MD engines. This hinders the researchers from using well-tested analysis tools creating an overhead during the trajectory analysis while making results more prone to error. Therefore, open-source Python libraries for trajectory analysis like MDAnalysis, MDtraj, and LiPhyphilic (based on MDAnalysis) that can work on multiple trajectory and topology formats are gaining more attention.
+\end{comment}
 Thanks to its recent update, CHARMM-GUI now can generate the topology and input parameters for the Drude force field, which greatly simplifies the employment of this model.
 
 \subsection{Simulations with CHARMM-Drude parameters}
@@ -281,7 +318,7 @@ The trajectories are publicly available on Zenodo.
 \subsection{Simulations with AMOEBA parameters}
 
 
-AMOEBA parameters are obtained from Githb [ref]. 
+AMOEBA force field parameters for OpenMM are obtained from GitHub [https://github.com/Inniag/openmm-scripts-amoeba,~\cite{klesse2020induced}]. The initial bilayer structures, similar to our simulations with the Drude2017 force field, are initially obtained from CHARMM-GUI membrane builder and equilibriated with the CHARMM36 force field for 200~ns. 
 
 \subsection{Analysis of simulations}
 Order parameters are calculated using the script "OrderParameters.py" under\\ "https://github.com/batukav/NMRlipidsVIpolarizableFFs/tree/master/scripts". \\
@@ -296,8 +333,9 @@ This project is performed using the "NMRLipids Databank" format and all related 
 \newpage
 %\begin{adjustbox}{angle=90}
 \begin{table}[]
+\begin{small}
 \begin{tabular}{cccccccccc}
-	Lipid/counter-ions                & force field  & Ion (M) & N$_{l}$ & N$_{w}$ & N$_{ion}$ & T (K) & t$_{sim}$ (ns) & t$_{analysis}$ (ns) & files \\ \hline
+	Lipid/ion                & force field  & Ion (M) & N$_{l}$ & N$_{w}$ & N$_{ion}$ & T (K) & t$_{sim}$ (ns) & t$_{anal}$ (ns) & files \\ \hline
 POPC                              & CHARMM-Drude & NA      & NA       & 6400       & 0         & 303    & 500              & 400         &          \cite{kav_batuhan_2021_4604630}    \\ \hline
 POPE                              & CHARMM-Drude & NA      & NA       & 6400       & 0         & 303    & 350              & 300         &          \cite{kav_batuhan_2021_4665773}    \\ \hline
 	\multirow{4}{*}{POPC:NaCl}        & CHARMM-Drude & 0.350   & 144      & 6400     & 41         & 303   & 500             & 400                  & \cite{kav_batuhan_2020_4683386}   \\
@@ -310,6 +348,8 @@ POPE                              & CHARMM-Drude & NA      & NA       & 6400    
 				  & CHARMM-Drude & 1.0   & 144      & 6400     & 114         & 303   & 500             & 400                  & \cite{kav_batuhan_2021_4738966}
 				  
 \end{tabular}
+\end{small}
+\caption{Systems simulated for this work. Column N$_l$ gives the number of lipids, N$_w$ gives the number of water molecules, T(K) denotes the temperature in kelvins. Simulated time is listed in column t$_{sim}$ and time used for analysis in t$_{anal}$. Column "files" gives the reference to open access simulation data.}
 \end{table}
 %\end{adjustbox}
 
@@ -336,6 +376,7 @@ POPE                              & CHARMM-Drude & NA      & NA       & 6400    
 %% Notice that the class file automatically sets \bibliographystyle
 %% and also names the section correctly.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\todo{batuhan: update the bib file to have 10ps fixed dt trajectories}
 \bibliography{nmrlipidsPOL.bib,references.bib}
 
 \end{document}
