@@ -58,6 +58,7 @@
 \author{Batuhan Kav}
 \affiliation{Forschungszentrum Juelich, Germany}
 \email{batuhankav@gmail.com}
+\author{Jesper J. Madsen}
 \author{Markus S. Miettinen}
 \author{O. H. Samuli Ollila}
 
@@ -69,8 +70,10 @@
 %\title[An \textsf{achemso} demo]
 %  {A demonstration of the \textsf{achemso} \LaTeX\
 %   class\footnote{A footnote for the title}}
-\title{NMRLipids VI: Polarizable Force Fields}
-
+%\title{NMRLipids VI: Polarizable Force Fields}
+\title{Do explicitly polarizable force fields give better description of a biomembrane?}
+%\title{Comparison of polarizable lipid models to high-resolution experimental data reveals room for improvement}
+%\title{Benchmarking polarizable lipid force field}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Some journals require a list of abbreviations or keywords to be
 %% supplied. These should be set up here, and will be printed after
@@ -110,54 +113,48 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-\textcolor{red}{some ideas for the intro/conclusion: 1) amoeba and drude are mostly used for transmembrane protein simulations. https://pubs.acs.org/doi/abs/10.1021/acsnano.1c06443 https://www.sciencedirect.com/science/article/abs/pii/S0959440X2100110X https://pubs.rsc.org/en/content/articlehtml/2021/sc/d1sc01887f etc. Validation/comparison of these simulations with the experiments are done for the proteins, not the lipids. Now since we know that the lipid dynamics and conformations are not very correct with the polarizable force fields, can these affect the protein conformations? is there a way to possibly connect this to the previous nmrlipids jacs paper?\\
-}
 
-Conventional classical molecular dynamics (MD) simulations only consider electrostatics as interactions between static point charges, set by molecular dynamics models (force fields) as an input in the beginning of the simulation. The dynamic effects arising from polarizability are ignored or at most enter the simulations in an averaged fashion in the force field parametrization process. However, since decades work~\cite{Thole1981,ando2001stable,Grossfield2003,
-lamoreux2003,Antila2013 ,Lemkul2016, baker2015polarizable,jing2019polarizable } has been underway to make MD simulations explicitly polarizable in the hopes of reaching a more accurate description of the system. 
+The dielectric environment in and around a lipid bilayer varies dramatically as you move from the water phase through the interfacial headgroup region to the membrane interior. The water phase highly polar, while the interfacial region contains dipolar headgroups, and the membrane interior is predominantly hydrophobic and nonpolar due to the aliphatic lipid tails. 
 
-In the case of biomembranes (lipid bilayers), specifically, the molecular (dielectric) environment varies dramatically while crossing the membrane from the water phase across the dipolar/charged headgroup interface to the hydrophobic tail region. Including explicit polarizability in biomembrane modelling has the potential to provide more accurate description of membrane binding, membrane crossing, and behaviour and interactions of molecules residing within membranes, such as membrane protein folding. There certainly is room for improvement: efforts from the NMRlipids open science community have shown that the current non-polarizable lipid models cannot correctly reproduce the conformational ensemble~\cite{Botan2015,Antila2019}, conformational dynamics~\cite{Antila2021}, or ion biding~\cite{Catte2016} within MD simulations. 
-
-Historically, there has been three main approaches to modelling polarizability: 1) the induced point dipole/multipole model where polarizable point dipoles are placed on chosen sites on a molecule, 2) the classical Drude oscillator model where polarization is modelled by separating a core and a shell charge with a spring which stretches according to the enviroment giving the site a dipole moment, and 3) the electronegativity equilization (fluctuating charge) model where atomic charges are no longer constant but can change according to the electronegativities of the molecule atoms and the electric fields from the molecular enviroment. In lipid modelling, the first two have surpassed the third in popularity. All of these approaches result in an increasing computational cost, e.g, by introducing new types of interactions, more interactions sites, or by requiring a shorter time step in the simulations.
-
-
-%To avoid polarizability catastrophe where two closeby polarizable sites feed off from each other and the dipole moments grow infinitely
+In conventional molecular dynamics (MD) simulations, electrostatic interactions are described by assigning static point charges to the atoms and molecules at the beginning of the simulation based on the force field definitions. Dynamic effects arising from molecular polarizability are traditionally not explicitly included and are only considered in an averaged fashion in the force field parametrization process when fitting to macroscopic observables. Significant efforts have been dedicated to introduce explicit polarizability into MD simulations, in the hopes of reaching a more accurate representation of the system~\cite{Thole1981,ando2001stable,Grossfield2003,
+lamoreux2003,Antila2013 ,Lemkul2016, baker2015polarizable,jing2019polarizable }. For bilayer membrane simulation, including polarizability in the lipids is expected to provide more accurate descriptions, especially in situations pertaining to membrane binding processes, translocation of charged biomolecules across the membrane, and the behavior of molecules residing within membranes, such as membrane proteins~\cite{baker2015polarizable,Lemkul2016, li2017drude,chu2018anionicpolarizable,Lynch21,Chen2021,Melcr:2018a, melcr2019improved,nencini22}. 
+%Indeed, even implicit inclusion of polarizability appears to provide a better description of cation binding to membranes~\cite{Melcr:2018a, melcr2019improved}. 
+The main lipid force fields with explicit electronic polarization are CHARMM-Drude~\cite{li2017drude, yu2023drude}, AMOEBA~\cite{chu2018anionicpolarizable,chu2018polarizable}, and CHARMM-Fluctuating Charge (FQ)~\cite{lucas2012charge}. The underlying treatment of polarizability differ among these models in the following way:  1) the classical Drude oscillator (CHARMM-Drude) models polarization by separating a core and a shell charge with a spring which stretches according to the envinronment giving the site a dipole moment~\cite{Lemkul2016},
+2) the induced point dipole/multipole (AMOEBA) uses polarizable point dipoles placed on chosen sites of the molecule~\cite{ponder2010current},
+and 3) the electronegativity equilization (FQ) employs atomic charges that are no longer constant but can change according to the electronegativities of the molecule atoms and the electric fields from the molecular enviroment~\cite{patel2004charmm}. All of these approaches result in an increasing computational cost, e.g, by introducing new types of interactions, more interactions sites, or by requiring a shorter time step in the simulations. As an alternative approach, electronic continuum correction (ECC) has been proposed as a computational efficient method to implicitly include polarizability by scaling the atom partial charges~\cite{Melcr:2018a,dijon20,Antila2021}.
 
 
 
-Considering the growing popularity of both implicitly and explicitly polarizable force fields and the increased computational cost that they require, a systematic benchmark study on polarizable force field quality is in great need. The few published studies reviewing the state of polarizable force fields for biomolecule simulations did not go beyond citing results from the existing studies~\cite{inakollu2020polarisable,jing2019polarizable,baker2015polarizable}. Recent publications show that \textit{implicit} inclusion of polarizability improves cation binding simulations when evaluated against NMR data~\cite{Melcr:2018a, melcr2019improved}, which suggest that including polarization explicitly could result in better description of ion binding as well. 
-Currently, there are three main polarizable lipid force fields with explicit electronic polarization: CHARMM-Drude~\cite{li2017drude}, AMOEBA~\cite{chu2018anionicpolarizable,chu2018polarizable}, and CHARMM-Fluctuating Charge (FQ)~\cite{lucas2012charge}. 
-Here we evaluate the performance of two actively developed polarizable force fields with lipid parameters available, CHARMM-Drude~\cite{li2017drude} and AMOEBA~\cite{chu2018anionicpolarizable,chu2018polarizable}, against NMR data. We use NMR order parameters to evaluate  structural properties and cation binding, whereas NMR relaxation rates and correlation times are utilized to benchmark the lipid conformational dynamics. Small angle scattering (SAXS) data is used to estimate the description of electron density profile of the membrane. Furthermore, we compare the results to the best performing non-polarizable simulations from the NMRlipids Databank\cite{Databank}.
+%Hence, there certainly is room for improvement: efforts from the NMRlipids open science community have shown that the current non-polarizable lipid models cannot correctly reproduce the conformational ensemble~\cite{Botan2015,Antila2019}, conformational dynamics~\cite{Antila2021}, or ion biding~\cite{Catte2016} within MD simulations. 
+
+Our previous efforts in benchmarking state-of-the-art non-polarizable force fields have demonstrated that the quality of predictions for important membrane properties greatly vary between different force fields, particularly for lipid headgroup conformational ensembles and ion binding affinities~\cite{Botan2015,Catte2016,Antila2019,bacle21,Antila2021,Antila2022,Databank}. This emphasizes the critical importance of rigorous comparative quality evaluations of simulations performed using different force fields, which helps to estimate the reliability of simulation results and select the best models for specific applications. This is particularly important when employing polarizable force fields, as they offer the potential to capture a broader range of physical phenomena pertinent to enhancing our understanding of in particular polar membrane regions, at an increased computational cost. Unfortunately, systematic benchmark studies assessing the quality of polarizable force fields are,  
+%is in great need. The few published studies reviewing the state of polarizable force fields for biomolecule simulations did not go beyond citing results from the existing studies
+to our knowledge, entirely missing from the field~\cite{inakollu2020polarisable,jing2019polarizable,baker2015polarizable}. Previous simulations using polarizable lipid force fields center around protein systems, with experimental validation (if performed at all) fovcusing on the properties of the proteins~\cite{jing2019polarizable, Lynch21}. Assessing the realism of the lipid models against experimental evidence from biophysical measurements is crucial since these membrane properties are foundational to more complicated applications, such as studies of transmembrane proteins. For example, it appears to be important that a wide variety of conformations is available for lipid headgroups in the model for realistic protein-lipid binding~\cite{bacle21}.
+
+Here we set out to assess the quality of available polarizable force fields, on par with previous evaluations of non-polarizable force fields, using the resources given by the NMRLipids open collaboration framework (https://databank.nmrlipids.fi/). Specifically, we evaluated the quality of POPC, DOPC and POPE lipid bilayer simulations with CHARMM-Drude~\cite{li2017drude,yu2023drude} and AMOEBA~\cite{chu2018anionicpolarizable,chu2018polarizable} parameters against experimental NMR and small angle X-ray scattering (SAXS) data. These two force fields are increasingly utilized in biomolecular simulations and have lipid parameters available for the selected systems with corresponding experimental data available from the NMRlipids databank~\cite{Databank}. Following the quality metrics defined in the NMRlipids project, structural properties and cation binding were evaluated against NMR order parameters and SAXS form factors~\cite{Botan2015,ollila16,Catte2016,Databank}, while lipid conformational dynamics was evaluated in comparison to data from NMR spin relaxation rate experiments~\cite{ferreira15,Antila2021}. 
+%Small angle scattering (SAXS) data is used to estimate the description of electron density profile of the membrane. 
+Furthermore, we compare the results to those obtained from the best performing non-polarizable simulations from the NMRlipids Databank\cite{Databank}. 
+
+ %n lipid modelling, the first two have surpassed the third in popularity.
+
+%All simulation data, analysis scripts, and results are publicly available in their corresponding links. No plausible nor implausible request is required to download, use, and disseminate the data.
 
 
-This project has been performed within the NMRLipids collaboration (https://databank.nmrlipids.fi/)~\cite{Databank}. All simulation data, analysis scripts, and results are publicly available in their corresponding links. No plausible nor implausible request is required to download, use, and disseminate the data. 
+
+
+ 
 
 
 
-
+ 
 \section{Results and Discussion}
 
-\subsection{Evaluation of lipid bilayer properties simulated with polarizable force fields}
+\subsection{Evaluation of lipid bilayer structural properties}
 
-We start by exploring the performance of polarizable force fields using the quality metrics developed in the NMRlipids Databank (https://databank.nmrlipids.fi/)~\cite{Databank}---a quality evaluated databank for lipid simulations. These metrics describe the ability of the models to reproduce the C-H NMR order parameters (quantifying the conformations) and the SAXS data (measuring the electron density variation across the membrane). For the former the molecule is divided into three parts, one containing the headgroup and the glycerol backbone carbons and one for each of the carbonyl tails, and the quality of each is evaluated separately. The quality metrics are summarized in Table~\ref{tab:my_label} and the performance of the force fields is visualized along with the underlying experimental measurables in Fig~\ref{fig:order_parameters}. 
-
-One can clearly see that the non-polarizable force fields, CHARMM36 and OPLS3e, consistently outperform the polarizable force fields with respect to the NMR measurables for all parts of the molecule (higher $P$-values). For older CHARMM-Drude force field, this is likely due to the headgroup and glycerol parametrization having been done targetting absolute average values of the order parameters instead of taking account the potential order parameter forking ( measurably different order parameters for different C--H bods at one carbon) and order parameter sign~\cite{Antila2022}. This was then remedied in the newer version of the model, which also provides better description of the carbon tails. In fact, for POPE sn-2 tail the CHARMM-Drude2023 gives the best description of the models investigated here.  The AMOEBA force field reproduces the most of the headgroup order parameters well for both DOPC and POPE but vastly overestimates one of the g$_3$ values, resulting in too large forking of oder parameters in this particular carbon. AMOEBA also clearly struggles to depict the tail conformations, in particular in the double bond region of DOPC (Fig.~\ref{fig:order_parameters}). In the tail regions, the CHARMM-Drude2023 appears to be the best out of the polarizable models. 
-
-The higher $FFq$ values (Table~\ref{tab:my_label}) of the polarizable force fields for POPC indicate that they are not able to reproduce the SAXS data quite as well as the best non-polarizable force field, OPLS3e. That said, CHARMM-Drude2023, in particular, is clearly better than its non-polarizable counterpart CHARMM36 and the best out of all the models here in capturing the POPE SAXS data. AMOEBA, on the other hand, captures the SAXS profile of POPE very poorly (Table~\ref{tab:my_label} and Fig.~\ref{fig:order_parameters}D top) which is likely connected to the overall description of the lipid tails in the force fields. Note that owing the simulation size dependency of the SAXS data~\cite{Databank} one should focus on the extrema $q_{z}$[\AA$^{-1}$] when comparing the simulated and experimental data. In particular $FFq$ only measures the difference between the first minima of the simulated and experimental curves. Also note, that the method for estimating the charge density of bilayers from the simulations places electrons as point charges at the atom centers in the system and does not consider any redistribution of charge density due to the polarizability. Nevertheless, we expect this results into a good estimate of the charge density for the calculation of the SAXS curve.
-
-\subsection{Evaluation of conformational dynamics of lipids}
-
-We proceed to evaluate (Fig.~\ref{fig:correlation_times}) the structural dynamics of the polarizable models againts NMR $R_{1}$ rates, here measured at a magnetic frequency that captures a window of dynamics around $\sim$0.1-1~ns, and effective correlation times $\tau_{\mathrm{eff}}$ which quantifies a larger range of dynamical processes up to $\sim$1000~ns. We include the same measurables calculated from non-polarizable CHARMM36 and SLipids force fields---the best MD force fields regarding the dynamics~\cite{Antila2021}---as a point of comparison. The AMOEBA force field captures the dynamics with respect to both measurables very well,  in par with the best non-polarizable models. In contrast, the dynamics of CHARMM-Drude appears to be faulty in the fast range ($R_{1}$ rates) and, furthermore, $\tau_{\mathrm{eff}}$ values reveal vastly too slow overall dynamics. The updated CHARMM-Drude2023 does not significantly improve the dynamics at the fast range investigated here. The effective correlation times of the newer Drude model are improved but still an order of magnitude too slow. This indicates that not only are the simulations with this polarizable force field computationally costly but one would have to simulate longer to obtain converged results. The non-polarizable counterpart of the Drude model, CHARMM36, exhibits much more realistic, faster effective correlation times. Interestingly, it has also been observed that CHARMM-Drude models have slower dynamic of water hydrogen bonding around amino acids compared to their non-polarizable counterpart~\cite{Ngo2019} which might align with an overall slower dynamics of the model in addition to enhanced water binding. Note that the experimental data here is from POPC. However, chemically identical the headgroup region the dynamics is assumed to be practically identical in DOPC, due to the decoupling of the dynamics between the headgroup and the glycerol regions~\cite{Antila2022rot, Klauda08}.
-
-\subsection{Cation binding to membranes in polarizable simulations}
-
-Finally, we address the premise that adding polarizability to force fields improves the depiction of ion binding to biomembranes in simulations. For this, we use the concept of "lipid electrometer"~\cite{Catte2016} where the amount of ion binding to the membrane can be quantified by the change in $\alpha$ and $\beta$ order parameters upon increasing salt concentration. These changes in order parameters are depicted in Fig.~\ref{fig:popc_order_parameter_change} whereas Fig.~\ref{fig:ion_density_profiles} gives the density profiles of ions with respect to the bilayer normal. The CHARMM-Drude2017 exhibits strong sodium binding, evidenced both by large change in the order parameters and the ion density profiles. Based on the change in the order parameters, the sodium binding is even stronger than the divalent calcium binding. In strong contrast, experimentally one sees no sodium binding and some binding of calcium ions. Too strong sodium binding in the CHARMM-Drude model has been indicated before for peptides/amino acids~\cite{Ngo2019, Kav2022} and deep-eutectic solvents~\cite{shayestehpour2022ion} along with a too strong calcium interactions~\cite{Tan2022} in line with what we observe here for the lipids. 
-
-The faulty sodium ion binding seems to have been somewhat remedied in the CHARMM-Drude2023 force field: the change of the order parameters is diminished to be more in line with experiments and only the some accumulation of sodium ions near the phosphate oxygen is seen in the ion distributions. Based on the change in the order parameters, the calcium binding also appears to be better represented in the updated model. The ion distributions reveal that binding of calcium has moved deeper into the bilayer and there is a stronger formation of ionic double layer by subsequent attraction of chloride into the bilayer. However, this the ion layering is most prominently present in the original CHARMM36 force field, for for sodium and calcium ions. Note, that both for sodium and calcium ion additionin the CHARMM-Drude2023force field reintroduces the forking of order parameters at the $\beta$ carbon in particular. These might also be a sign of poor convergence of the simulations owing to the slow conformational dynamics detected above, which would also not be fully reflected in the calculation of error estimates for the order parameters. 
-
-As opposed to the CHARMM36-Drude model, the order parameters of the AMOEBA model are almost completely unaffected by the ion addition, both for NaCl and CaCl$_{2}$. The ion density profiles confirm that very little ions penetrate the membrane region where the lipid phosphates reside. While this is in line with experiments regarding sodium ions, there should be some binding of calcium ions to the membrane. Again, the change in the order parameters indicate the non-polarizable CHARMM36 depicts sodium binding the best out of the models compared here, being slightly more realistic than its most recent polarizable counterpart, CHARMM-Drude2023. Regarding calcium binding, CHARMM36 captures the $\Delta^{\alpha}_{CH}$ about as well as the CHARMM-Drude2023, but the change in the $\beta$ carbon is better represented in the CHARMM-Drude2023 and AMOEBA models. This suggest that some accuracy might have been gained in modelling the divalent ion binding with polarizable models but the advantage is not clear. No force field, polarizable or non-polarizable, is able to model both monovalent and divalent ion binding flawlessly. This is of note, as polarizable force fields are often assumed superior and concequently a popupar choice in modelling, eg, ion channels~\cite{sun2017 jing2019polarizable, klesse2020induced}\todo{I think there is a mistake in the C36 data, firsly, the concentration should probably be 950mM instead of 1000mM and secondly the monovalent anion and cation curves look identical} ~\todo{batuhan: I fxed the anion and cation curves. Yes, C36 data is at 950mM but explicitly adding this as a new color could clutter the figure. Should I just mention this in the caption?}.
-
-
+To evaluate the structural properties of lipid bilayers in simulations with polarizable force fields, we simulated POPC and POPE lipid bilayers with CHARMM-Drude2017~\cite{li2017drude} and CHARMM-Drude2023~\cite{yu2023drude} parameters, and POPE and DOPC bilayers with AMOEBA~\cite{chu2018anionicpolarizable,chu2018polarizable} parameters. These systems were selected based on simultaneous availability of force field parameters, and experimental data~\cite{Databank}. After the data production, simulation trajectories were added into the NMRlipids Databank (https://github.com/NMRLipids/Databank/) and the NMRlipids quality metrics was used to evaluate each simulation against experiments~\cite{Databank}. This metric measures the quality of conformational ensemble of individual lipids in two aspects: first, it evaluates agreement with C-H bond order parameters (from NMR), and second, it examines consistency of membrane dimensions compared to small angle X-ray scattering (SAXS) data~\cite{Databank,ollila16}. 
+%(measuring the electron density variation across the membrane). 
+The former is divided into three parts that separately describe the average quality of headgroup, glycerol backbone and acyl chain qualities as described in the NMRlipids databank~\cite{Databank}. While order parameters primarily reflect lipid conformations, acyl chain order parameters are also a good proxy for membrane packing since a smaller area per lipid tends to increase the magnitude of the order parameters~\cite{Databank}. 
+%one for each of the carbonyl tails, and the quality of each is evaluated separately. 
 
 \begin{figure}[t]
     \centering
@@ -165,15 +162,6 @@ As opposed to the CHARMM36-Drude model, the order parameters of the AMOEBA model
     \includegraphics[width=0.4\textwidth]{Figures/molecules.pdf}
     \caption{Molecules and atom labelling used.}
     \label{fig:molecules}
-
-\end{figure}
-
-\begin{figure}[!hbt]
-    \centering
-    %\includegraphics{Figures/order_parameters.png}
-    \includegraphics[width=0.8\textwidth]{Figures/quality.pdf}
-    \caption{X-ray scattering form factors, and C-H bond order parameters for headgroup and glycerol backbone, and acyl chains (from top to bottom) compared between simulations and experiments using the NMRlipids databank. The atom labelling is as depicted in Fig.~\ref{fig:molecules}.}
-    \label{fig:order_parameters}
 
 \end{figure}
 
@@ -185,8 +173,8 @@ As opposed to the CHARMM36-Drude model, the order parameters of the AMOEBA model
         \hline
         POPC & OPLS3e       & 0.76 & 0.87 & 0.85 & 0.15 & 66.5\\
         POPC & CHARMM36     & 0.70 & 0.54 & 0.69 & 1.16 & 65.0\\
-        POPC & CHARMM-Drude & 0.51 & 0.22 & 0.47 & 1.16 & 62.5\\
-        POPC & CHARMM-Drude2023 & 0.50 & 0.49 & 0.53 & 0.82 & 64.5\\
+        POPC & CHARMM-Drude & 0.52 & 0.29 & 0.53 & 1.06 & 62.5\\
+        POPC & CHARMM-Drude2023 & 0.63 & 0.60 & 0.57 & 0.96 & 64.5\\
         \hline
         POPE & GROMOS-CKP & 0.29 & 0.83 & 0.48 & 0.40 & 59.6\\
         POPE & CHARMM36   & 0.54 & 0.52 & 0.27 & 1.30 & 57.2 \\
@@ -196,41 +184,66 @@ As opposed to the CHARMM36-Drude model, the order parameters of the AMOEBA model
         \hline
         DOPC & AMOEBA & 0.60 & 0.60 & 0.54 & - & 70.2\\
     \end{tabular}
-    \caption{NMRlipids databank quality evaluations~\cite{Databank} and area per lipids compared between the best simulations found from the NMRlipids databank, simulations with CHARMM36 force field, and simulations with polarizable force fields. Experimental estimations for areas per lipid are POPC: 64.3$\pm1$\AA$^{2}$\cite{kucerka2011}, DOPC: 67.5$\pm1$\AA$^{2}$\cite{kucerka2008}, and POPE: 56.7$\pm$3\AA$^{2}$\cite{Rickeard2020}.}
+    \caption{NMRlipids databank quality metrics~\cite{Databank} and area per lipids (APL) compared between the best simulations found from the NMRlipids databank (OPLS3e for POPC and GROMOS-CKP for POPE), simulations with CHARMM36 force field, and simulations with polarizable force fields. Order  parameter quality measures, $P^{\mathrm{headgroup}}$, $P^{sn-1}$, and $P^{sn-2}$, present the average probability of order parameters within a given segment to agree with experiments (larger probabilities mean higher quality). Form factor quality measure, $FF_{q}$, presents the difference in essential features between simulated and experimental form factors (smaller values indicate higher quality). Experimental estimations for areas per lipid are POPC: 64.3$\pm1$\AA$^{2}$\cite{kucerka2011}, DOPC: 67.5$\pm1$\AA$^{2}$\cite{kucerka2008}, and POPE: 56.7$\pm$3\AA$^{2}$\cite{Rickeard2020}.}
     \label{tab:my_label}
 \end{table}
 
-%\begin{figure}[!hbt]
-%	\centering
-%	\includegraphics{dihedral_distributions_for_all.png}
-%	\caption{The distributions of the torsion angles for the head group atoms}
-%	\label{fig:dihedral}
-%        \todo{SAMULI: I am not sure if we need this figure at all.
-%          Or were you planning to discuss why order parameter response to ions is qualitatively incorrect in Drude PC?
-%          If yes, then maybe remove POPE from this figure.
-%        }
-%\end{figure}
 
-\begin{figure}[!hbt]
-	\centering
-	\includegraphics{Figures/dihedral_distributions_without_ions.eps}
-	\caption{The distributions of the torsion angles for the head group atoms. For each torsion angle, the upper and lower rows contain the DOPC (AMOEBA) - POPC (Drude/Drude2023) and POPE lipids, respectively.}
-	\label{fig:dihedral_no_salt}
+
+\begin{figure}[!p]
+    \centering
+    %\includegraphics{Figures/order_parameters.png}
+    \includegraphics[width=0.8\textwidth]{Figures/quality.pdf}
+    \caption{X-ray scattering form factors, and C-H bond order parameters for headgroup and glycerol backbone, and acyl chains (from top to bottom) compared between simulations and experiments using the NMRlipids databank. The atom labelling is as depicted in Fig.~\ref{fig:molecules}. Experimental data in this figure are originally reported in Refs.~\citenum{ferreira13,bacle21,Databank,NMRlipidsIII,kucerka2015}. For CHARMM-Drude2023 simulations we selected representative replicas among three available simulations, for example for differences between replicas for POPC see Fig.~\ref{fig:order_parameters_replicas}.}
+    \label{fig:order_parameters}
+
 \end{figure}
+
+Direct comparisons between simulated and experimental data are visualized in Fig~\ref{fig:order_parameters} and the resulting quality metrics are shown in Table~\ref{tab:my_label}. Similarly to the non-polarizable CHARMM36 simulations with Gromacs, CHARMM-Drude simulation predicts slightly too packed membrane with excessively negative order parameters with respect to experiments and simulations with the highest quality in the NMRlipids databank (OPLS3e)~\cite{Databank}. However,
+%consistently outperform the polarizable force fields with respect to the NMR measurables for all parts of the molecule (higher $P$-values). For older CHARMM-Drude force field, 
+the quality of headgroup conformations in the CHARMM-Drude simulations is worse than in its non-polarizable counterpart. This is likely because headgroup and glycerol backbone parameters were optimized to reproduce absolute average values of the experimentally determined order parameters, instead of taking into account the order parameter forking (meaning measurably different order parameters for different C--H bonds at a single carbon atom) and order parameter sign~\cite{Antila2022}. A better description of the headgroup and glycerol backbone is provided by CHARMM36-Drude2023, yet its quality is still below that offered by the non-polarizable CHARMM36 parameters (see also discussion about conformational dynamics below). Also the quality of membrane packing and acyl chain order are improved in CHARMM36-Drude2023 compared to the earlier version but again, it did not perform at a quality comparable to that of the best available simulations.
+%also provides better description of the carbon tails. 
+%In fact, for POPE sn-2 tail the CHARMM-Drude2023 gives the best description of the models investigated here.  
+
+ AMOEBA simulations capture the headgroup and glycerol backbone order parameters reasonably well with the exception of g$_1$,
+%ll for both DOPC and POPE but vastly overestimates one of the g$_3$ values, resulting in 
+where forking of order parameters is unacceptably large. However, experimentally observed low order parameters at double bond region in both DOPC acyl chains and {\it sn}-2 chain of POPE are not captured. These low order parameters signal an important mechanism through which acyl chain double bonds affect membrane properties~\cite{ollila07} and are well reproduced in all state-of-the art MD simulation parameters~\cite{ollila16}. Furthermore, AMOEBA parameters substantially overestimate the area per lipid in POPE simulations, leading to too disordered acyl chains. Similar issues are evident also in membrane data presented in the recent publication for the AMOEBA cholesterol model~\cite{Li23chol}.
+%also clearly struggles to depict the tail conformations, in particular in the double bond region of DOPC (Fig.~\ref{fig:order_parameters}). 
+%parameters do not capture the  
+%In the tail regions, the CHARMM-Drude2023 appears to be the best out of the polarizable models. 
+ 
+
+The unsatisfactory description of the lipid tail region and the area per lipid is further reflected in the inability of AMOEBA to capture the SAXS curves. Thus, we can conclude that our simulations with the AMOEBA parameters did not reproduce essential
+membrane properties. The higher $FFq$ values (Table~\ref{tab:my_label}) of the polarizable force fields in general indicate that they are not able confer consistency with the SAXS data as well as the best non-polarizable force fields (OPLS3e). That said, CHARMM-Drude2023 is on par with or better than its non-polarizable counterpart CHARMM36 and the best out of all the models here in capturing the POPE SAXS data, benefiting from the improvements made in the description of acyl chains.
+
+
+
+
+\subsection{Evaluation of conformational dynamics of lipids}
+C-H bond order parameters are sensitive to the conformational ensemble but the correspondence is not unique. Instead, they essentially describe the average of the distributions and do not contain information of the dynamics of the confomational sampling. Therefore, a simulation that reproduces the order parameters has an ensemble that is only potentially correct, and even the correct ensemble may not have the experimentally observed dynamics. To further elucidate this aspect in the case of polarizable force fields, we compared NMR $^{13}$C spin relaxation $R_{1}$ rates and C-H bond effective correlation times $\tau_{\mathrm{eff}}$ with experiments~\cite{ferreira15} and best non-polarizable simulations from our previous study~\cite{Antila2021} for simulations with PC headgroups and the glycerol backbone in Fig.~\ref{fig:correlation_times}. This focus was chosen based on the availability of both experimental data and polarizable simulations. $R_{1}$ rates measured with typical magnetic field strengths are sensitive to rotational dynamics of C-H bonds with the timescales around $\sim$0.1-1~ns, while effective correlation times respond to a larger range of dynamical processes up to $\sim$1000~ns~\cite{ferreira15}. The effective correlation time can be interpreted as an average measure for how fast molecular conformations sample the phase space that leads to the average order parameters.
+
+The effective correlation times in CHARMM-Drude2017 and CHARMM-Drude2023 simulations are approximately two  and one orders of magnitude slower, respectively, than the values suggested by experiments and best available simulations (Fig.~\ref{fig:correlation_times}). This indicates that not only are the simulations with this polarizable force field computationally costlier for equivalent lengths of trajectory, but one would also have to simulate longer to obtain converged results. The non-polarizable counterpart of the Drude models, CHARMM36, exhibits much more realistic, faster effective correlation times. Also the dynamics in the fast range ($R_{1}$ rates), are on average slightly more realistic in the non-polarizable CHARMM36 compared to both of the polarizable counterparts. Interestingly, CHARMM-Drude models have been reported to have slower water hydrogen bonding dynamics around amino acids compared to their non-polarizable counterpart,~\cite{Ngo2019} which might align with an overall slower dynamics of the model in addition to enhanced water binding. 
+
+In contrast to the Drude-based models investigated here, the $R_1$ spin relaxation times and effective correlation times from DOPC simulations with AMOEBA force field are close to experimental data from POPC and on par with the best non-polarizable models (Slipids and CHARMM36). The small difference in acyl chain composition (DOPC vs. POPC) is not expected to strongly affect headgroup dynamics due to effective decoupling between hydrophilic and hydrophobic membrane regions~\cite{Antila2022rot, Klauda08}.
+%appears to be faulty in the fast range ($R_{1}$ rates) and, furthermore, $\tau_{\mathrm{eff}}$ values reveal vastly too slow overall dynamics. The updated CHARMM-Drude2023 does not significantly improve the dynamics at the fast range investigated here. The effective correlation times of the newer Drude model are improved but still an order of magnitude too slow. This indicates that not only are the simulations with this polarizable force field computationally costly but one would have to simulate longer to obtain converged results. The non-polarizable counterpart of the Drude model, CHARMM36, exhibits much more realistic, faster effective correlation times. 
+%Interestingly, it has also been observed that CHARMM-Drude models have slower dynamic of water hydrogen bonding around amino acids compared to their non-polarizable counterpart~\cite{Ngo2019} which might align with an overall slower dynamics of the model in addition to enhanced water binding. 
+%Note that the experimental data here is from POPC. However, chemically identical the headgroup region the dynamics is assumed to be practically identical in DOPC, due to the decoupling of the dynamics between the headgroup and the glycerol regions~\cite{Antila2022rot, Klauda08}.
+
+%We include the same measurables calculated from non-polarizable CHARMM36 and SLipids force fields---the best MD force fields regarding the dynamics~\cite{Antila2021}---as a point of comparison. 
 
 \begin{figure}[!hbt]
 	\centering
 	\includegraphics{Figures/both_inkscp.pdf}
 	\caption{Effective correlation times (top) and R$_1$ rates (bottom) for the polarizable models and best performing non-polarizable force fields. Note, top panel axis is logarithmic to visualize the slow Drude dynamics. Experimental values are obtained from Ref.~\citenum{Antila2022rot}. All simulations used here were salt free.}
 	\label{fig:correlation_times}
-
-
 \end{figure}
 
-\clearpage
 
-\subsection{Ion binding to membranes in simulations with polarizable force fields}
+\subsection{Cation binding to membranes in polarizable simulations}
 
+Given the abundance of cations in biological systems, accurately capturing their interactions with membranes has the uttermost importance in MD simulations. A wealth of  experimental evidence shows that monovalent ions, such as sodium (except for lithium), exhibit very weak binding affinity of PC lipid bilayers, while multivalent ions like calcium bind more strongly~\cite{Catte2016}. However, simulations with non-polarizable force fields without any additional corrections systematically overestimate cation binding to lipid bilayers~\cite{Catte2016}. Implicit inclusion of electronic continuum correction (ECC) to both ion and lipid parameters can substantially improve the situation~\cite{Melcr:2018a,melcr2019improved,bacle21}, suggesting that electronic polarizability plays an important role in ion binding to membranes, which might further lead one to expect that that simulations with polarizable force fields will perform better in this aspect and more accurately describe ion binding to membranes.
+%Finally, we address the premise that adding polarizability to force fields improves the depiction of ion binding to biomembranes in simulations. 
+To test this notion, we evaluated sodium and calcium cation binding to membranes against the experimental NMR data using the "lipid electrometer," which involves quantifing the amount of ion binding to the membrane by monitoring the change in lipid headgroup order parameters in response to increasing salt concentration~\cite{Catte2016}. Changes in these order parameters induced by increasing NaCl and CaCl$_2$ are shown in Fig.~\ref{fig:popc_order_parameter_change} for simulations and experiments, whereas Fig.~\ref{fig:ion_density_profiles} shows the density profiles of ions with respect to the bilayer normal. Results from AMBER-based ECC-lipid model are shown for the reference that gives a good agreement with experiments for cation binding. 
 
 \begin{figure}[!hbt]
 	\centering
@@ -250,8 +263,46 @@ As opposed to the CHARMM36-Drude model, the order parameters of the AMOEBA model
           \todo{Batuhan: Data generated from http://dx.doi.org/10.1021/acs.jpcb.7b12510}
 \end{figure}
 
+The CHARMM-Drude2017 predicts similar calcium ion density profile to ECC-lipids, in good agreement with experiments. However, the sodium binding is equally strong in these simulations in contrast with the experimental evidence~\cite{Catte2016}. 
+%, evidenced both by large change in the order parameters and the ion density profiles. Based on the change in the order parameters, the sodium binding is even stronger than the divalent calcium binding. In strong contrast, experimentally one sees no sodium binding and some binding of calcium ions. 
+Excessive sodium binding in the CHARMM-Drude model has been noticed before for systems containing peptides or amino acids~\cite{Ngo2019, Kav2022} and deep-eutectic solvents~\cite{shayestehpour2022ion}. Excessive calcium interactions, in line with what we observe here for the lipids, have also been reported~\cite{Tan2022}. Furthermore, the response of headgroup order parameters to the bound ions is not in qualitative agreement with experiments for CHARMM-Drude2017 simulations according to Fig.~\ref{fig:popc_order_parameter_change}. Particularly, increasing $\alpha$ carbon order parameters and forking upon ion binding are not observed in experiments. This is in contrast with the results from non-polarizable simulations, where experimentally observed decrease of order parameters to more negative values upon ion binding were observed in all simulations, even though the binding affinity was often inaccurately predicted~\cite{Catte2016}. This qualitative discrepancy in CHARMM-Drude2017 simulations most likely results from incorrect lipid headgroup conformational ensemble (see previous sections), which leads to inaccuracies in the structural response of the ensemble to ion binding. 
 
-\clearpage
+In simulations with CHARMM-Drude2023 parameters, sodium ion binding is in line with ECC-lipid simulations when comparing density profiles,
+%force field: the change of the order parameters is diminished to be more in line with experiments and only the some accumulation of sodium ions near the phosphate oxygen is seen in the ion distributions. 
+%However, this the ion layering is most prominently present in the original CHARMM36 force field, for for sodium and calcium ions. 
+but addition of sodium or calcium ions seems to induce forking of order parameters in contrast to experiments. 
+%at the $\beta$ carbon in particular. 
+This might indicate inaccurate structural response to ion binding, but poor convergence of the simulations owing to the slow conformational dynamics detected above cannot be ruled out in this case or in the case of the older 2017 version.
+%, which would also not be fully reflected in the calculation of error estimates for the order parameters. 
+Based on density profiles, calcium binding in CHARMM-Drude2023 simulations is in line with the ECC-lipid model, although binding affinity is slightly larger, 
+%also appears to be better represented in the updated model. The 
+ions penetrate slightly
+%reveal that binding of calcium has moved 
+deeper into the bilayer, and there is a stronger formation of ionic double layer by subsequent attraction of chloride into the bilayer. 
+%As opposed to the CHARMM36-Drude model, the order parameters of the AMOEBA model are almost completely unaffected by the ion addition, both for NaCl and CaCl$_{2}$. The ion density profiles confirm that very little ions penetrate the membrane region where the lipid phosphates reside. While this is in line with experiments regarding sodium ions, there should be some binding of calcium ions to the membrane. 
+In AMOEBA simulations, sodium binds weakly and does not affect order parameters, consistent with experiments and ECC-lipid simulations. However, order parameters do not change upon calcium binding in accordance with experiments and other simulations. This can be explained by the binding position of calcium, which is outside phosphate density peak in AMOEBA simulations, whereas calcium penetrates to phosphate region or deeper in other simulations and thereby reorients the headgroup dipole, giving rise to changes in order parameters~\cite{Catte2016}. 
+
+
+%Again, the change in the order parameters indicate the non-polarizable CHARMM36 depicts sodium binding the best out of the models compared here, being slightly more realistic than its most recent polarizable counterpart, CHARMM-Drude2023. Regarding calcium binding, CHARMM36 captures the $\Delta^{\alpha}_{CH}$ about as well as the CHARMM-Drude2023, but the change in the $\beta$ carbon is better represented in the CHARMM-Drude2023 and AMOEBA models. This suggest that some accuracy might have been gained in modelling the divalent ion binding with polarizable models but the advantage is not clear. No force field, polarizable or non-polarizable, is able to model both monovalent and divalent ion binding flawlessly. This is of note, as polarizable force fields are often assumed superior and concequently a popupar choice in modelling, eg, ion channels~\cite{sun2017 jing2019polarizable, klesse2020induced}
+\todo{I think there is a mistake in the C36 data, firsly, the concentration should probably be 950mM instead of 1000mM and secondly the monovalent anion and cation curves look identical} ~\todo{batuhan: I fxed the anion and cation curves. -> @batuhan will plot the c36 data in a different color for the 950mm case.s}.
+
+%\begin{figure}[!hbt]
+%	\centering
+%	\includegraphics{dihedral_distributions_for_all.png}
+%	\caption{The distributions of the torsion angles for the head group atoms}
+%	\label{fig:dihedral}
+%        \todo{SAMULI: I am not sure if we need this figure at all.
+%          Or were you planning to discuss why order parameter response to ions is qualitatively incorrect in Drude PC?
+%          If yes, then maybe remove POPE from this figure.
+%        }
+%\end{figure}
+
+%\clearpage
+
+%\clearpage
+
+In conclusion, incorporating explicit polarizability as done in CHARMM-Drude or AMOEBA force fields do not necessarily lead to improved description of cation binding to phospolipid membranes. However, it is difficult to isolate the explicit influence of polarizability per se on ion binding based on the results presented here. What is clear, however, is that the headgroup conformational ensemble, which presumably plays a role in ion binding, is poorly described by the CHARMM-Drude parameters. In addition, the AMOEBA parameters struggle to capture the basic membrane properties that are reproduced by all current state-of-the-art MD simulation models.
+
 
 \subsection{Discussion}
 
@@ -259,13 +310,23 @@ As opposed to the CHARMM36-Drude model, the order parameters of the AMOEBA model
 drude sodium overbinds to proteins, as shown here https://pubs.rsc.org/en/content/articlepdf/2022/ra/d2ra01478e and https://onlinelibrary.wiley.com/doi/abs/10.1002/adts.201800106. Venable also cautioned us against using any ion parameters with the drude force fields. This is important as 1- polarizable force fields are supposed to be better for ion parameters and 2- they are generally used to study the ion channels.}
 
 \subsection{Conclusions}
-After comparing the polarizable lipid models against high-resolution experimental data and the best performing non-polarizable force fields, we cannot confirm that adding polarizablity to the force fields has yet solved many of the issues it was hoped to address. Monovalent ion binding is best represented in the non-polarizable CHARMM36 and the polarizable AMOEBA. However, AMOEBA does not model well the divalent ion binding to bilayers. For calcium binding the best models are CHARMM36 and the polarizable CHARMM-Drude2023.
- The electron density profiles of the bilayers are quite well captured by CHARMM-Drude2023 but rather poorly by AMOEBA, within the confines of the approximations used to calculate them from the trajectories. AMOEBA's poor performance regarding electron density curves might be related to the poor representation of lipid tail conformations in the force field, revealed by the order parameters. While CHARMM-Drude2023 captures tail and the headgroup conformations well, the non-polarizable models still outperform when comparing the order parameters. When investigating the conformational dynamics the AMOEBA force field produces results, specifically in the headgroup region of PC lipids, that are in par or better than the best non-polarizable force fields. However, the Drude models exhibit an extremely slow dynamics which leads to deficient sampling and compounding simulation time cost when using the model. In summary, the added complexity of polarizability has not still realised its potential to the fullest; The non-polarizable force fields with longer and more intense refinement behind them still outperform the polarizable models in some respects. Considering the complexity and cost of using these models, polarizability should be parameterized with more thorough consideration to the experimental benchmarks. When doing so, potential for improvement is significant, as exemplified by the refinement of the CHARMM-Drude2017 model to the most recent CHARMM-Drude2023 version.
+We have rigorously compared simulation output of model lipid bilayers using polarizable lipid force fields with high-resolution experimental data as well as results from best-performing non-polarizable force fields. From this exercise, it is evident that current polarizable force fields for lipids fall short in important aspects. In most cases, the best non-polarizable models exhibits superior performance and accuracy across all the categories investigated in this study.
+
+Evaluation order parameters and scattering form factors reveals that the AMOEBA force field has difficulties in producing membranes with reasonable physical properties. In constrast, the CHARMM-Drude2023 model has improved performance in this regard, notably surpassing its predecessor, CHARMM-Drude2017. Nevertheless, top-performing non-polarizable models generally reproduce experimental conformations (order parameters) better, although not perfectly so.
+
+In regard to conformational dynamics, the AMOEBA force field produces results, specifically in the headgroup region of PC lipids, that are either on par with or better than the best non-polarizable force fields. However, the CHARMM-Drude models exhibit an extremely slow dynamics, which can lead to deficient sampling and a substantial increase in simulation simulation time when using this model.
+
+
+In general, the ECC model exhibits thet most accurate representation of ion binding, even though it lacks an explicit description of polarization. The non-polarizable CHARMM36, when used with the NBFix ion model designed to provide more accurate binding, does XXX. The polarizable AMOEBA and Drude-2023 models show similar ion binding levels to the ECC model, but they exhibit variation in binding depth and the consequent structural response of the lipids do not align with experiments. The incorrect response to ion binding likely connects to the the other inaccuracies described above, including the misrepresentation of overall membrane structure and diversity in the conformational ensemble, as well as slow dynamics that lead to poor convergence of simulations. 
+
+ In summary, the full potential and promise of explicitly polarizable force fields have still not been fully realized. Non-polarizable force fields benefit from a longer history of intense scrutiny and out-perform their polarizable counterparts in many respects, as we here show for the case of certain phospholipid bilayers. Considering the complexity and cost of using these models, it is crucial to parameterize polarizability with more thorough consideration to the experimental benchmarks. Doing so holds great potential for improvement, as demonstrated by the refinement of the CHARMM-Drude2017 model to the most recent CHARMM-Drude2023 version.
 
 \section{Methods}
-\subsection{Practical pitfalls of polarizable biomembrane simulations}
+%\subsection{Practical pitfalls of polarizable biomembrane simulations}
 
 
+\begin{comment}
+    
 \subsubsection{Building a polarizable force field}
 
 The atomic point charges describing the electrostatics in non-polarizable force fields are typically parameterized by fitting to the electrostatic potential energy surface around one or few conformers obtained from ab initio calculations. One then proceeds to build on top of that the parameters for Lennard-Jones interactions and the dihedrals using a mixture of experimental (such as heats of vaporizations) and quantum mechanical information. For a polarizable force fields, this process has to be redone as in the first step the polarizable contribution has to be separated from the "static" one. Furthermore, for the polarization models considered here, an additional cutoff/damping scheme needs to be introduced to prevent polarization catastrophe~\cite{Thole1981}---a phenomenon where close-by dipoles feed of each others and their dipole moments (and energy) grows into infinity.
@@ -274,7 +335,7 @@ Both polarizable lipid force fields considered here use a bottom up approach whe
 
 In the AMOEBA force field, a set of atomic multipoles were first obtained based on the QM electron densities using Stone's distributed multipole analysis~\cite{Stone1981}. The atoms were then assigned polarizabilities according to the AMOEBA atom types and induced dipole contribution was self consistently subtracted from the permanent dipoles~\cite{shi2013proteinamoeba}. The charges (monopoles) were then kept constant while the multipoles were refined against the electrostatic potential energy surface around few conformers of the molecular fragments. %Multipoles are allowed to induce only dipoles at polarizable sites outside their immediate environment (polarization group). 
 After electrostatic parameters were set, the Lennard-Jones parameters were taken from previous AMOEBA parameterizations of smaller molecules containing same functional groups~\cite{Ren2011polorganic,shi2011hydration}, and then refined against molecule - water (gas phase) interaction energies. After settling all the nonbonded parameters, dihedral potentials were parameterised based on the QM conformational energy profiles.
-
+\end{comment}
 \begin{comment}
 - polarization contribution has to be separated from point charge electrostatics in the parametrization process.
 - for the models considered here (Drude, IDP) one has to prevent the polarization catastrophe somehow (Thole damping parameter)
@@ -294,36 +355,41 @@ Notes on AMOEBA parametrization (this is NOT well explained in the paper)
 -dihedrals optimized to QM potentials
 -no mention of the screening for polarization? Do they use some AMOEBA value
 \end{comment}
-\subsubsection{Using a polarizable force field}
+\subsection{Using a polarizable force field for membrane simulations}
 
-The increased level of detail portrayed by explicit treatment of electronic polarizability comes with certain costs. The first cost is the increased computational complexity reduces the simulation speed. For the Drude force field, this slowdown occurs both because the addition of the Drude particles increases the number of interaction pairs and the employed extended dual-Langevin thermostat requires 1~fs integration time step. Current AMOEBA force field can use a multi time-step integration algorithm where the non-electronic interactions are iterated with a 2~fs time step whereas more computationally unstable polarization terms are iterated with a smaller time step. Yet, this usage of a multi-time step integration scheme does not overcome the slowdown resulting from the computationally demanding polarization calculations. As a result, one experiences almost a ten-fold decrease in the simulation speed while using the polarizable force fields. The second cost is due to the limited software support for both running and analyzing the simulations. Currently only OpenMM supports both AMOEBA and Drude force fields. NAMD can only run the Drude force field whereas TINKER is only compatible with AMOEBA force field and does not support semi-isotropic pressure coupling, which decouples the pressure tensor in $xy$ and $z$-direction and is crucial for correctly evaluating the ion binding properties of the bilayers (\todo{This needs a reference, I remember Samuli mentioning this during a chat}). On the other hand, GROMACS, which has been the most popular MD engine within the bilayer simulation field, only has limited support for the Drude polarizable force field via an unofficial git-branch~\cite{drudegithub} but does not support AMOEBA at all.
-\begin{comment}
-This is particularly important, as GROMACS also comes with many built-in functions for analyzing the trajectories and many of these functions require a GROMACS tpr file and subsequently cannot be utilized for analyzing the trajectories generated by other MD engines. This hinders the researchers from using well-tested analysis tools creating an overhead during the trajectory analysis while making results more prone to error. Therefore, open-source Python libraries for trajectory analysis like MDAnalysis, MDtraj, and LiPhyphilic (based on MDAnalysis) that can work on multiple trajectory and topology formats are gaining more attention.
-\end{comment}
-Thanks to its recent update, CHARMM-GUI now can generate the topology and input parameters for the Drude force field, which greatly simplifies the employment of this model.
+Considering the increased interest in polarizable force fields in membrane simulations, we mention here some hurdles in their practical usage. Firstly, the increased level of detail obtained by explicit treatment of electronic polarizability always comes with increasing computational cost. For the Drude-based models, this slowdown occurs both because the addition of the Drude particles increases the number of interaction pairs and the employed extended dual-Langevin thermostat requires a shorter 1~fs integration time step, compared to the 2~fs typically used for non-polarizable membrane simulations. The AMOEBA force field can use a multi time-step integration algorithm where the non-electronic interactions are iterated with a 2~fs time step whereas more computationally unstable polarization terms are iterated with a smaller time step. However, the multi-time step scheme  only partly mitigates the computational cost: one typically experiences almost a ten-fold decrease in the simulation speed while using the polarizable force fields. 
+
+Secondly, there are compability issues with the most used MD engines and the polarizable models and that support might be version dependent. Currently, only OpenMM supports both AMOEBA and Drude force fields. NAMD can only run the Drude force field whereas TINKER is only compatible with AMOEBA and does not support semi-isotropic pressure coupling, which decouples the pressure tensor in $xy$ and $z$-direction and is crucial for correctly modelling membrane systems~\cite{xxx}. GROMACS---the most popular MD engine within the bilayer simulation field---only has limited support for the Drude polarizable force field via an unofficial Git-branch~\cite{drudegithub} and no support for AMOEBA. 
+
+In general, easy access to MD engines, as well as adaptability of common analysis tools and libraries for polarizable force fields, will be crucial in facilitating more wide-spread utilization of these models. Fortunately, CHARMM-GUI now can generate the topology and input parameters for the Drude force field, which greatly simplifies the employment of this model in particular~\cite{kognole2022charmm}.
 
 \subsection{Simulations with CHARMM-Drude parameters}
 
-CHARMM-Drude 2017 force field parameters for OpenMM were extracted from CHARMM-GUI~\cite{jo2008charmm,lee2016charmm} \textit{Membrane Builder}~\cite{wu2014charmm,jo2009charmm,jo2007automated,lee2018charmm} and \textit{Drude Prepper}~\cite{kognole2022charmm}. 
-CHARMM-Drude simulations were performed with OpenMM 7.5.0~\cite{eastman2017openmm}.
-Initial membrane structures have been equilibrated for 200~ns using the CHARMM36 force field~\cite{klauda2010update}. The last frames of these simulations were used to generate the starting structures for the polarizable force field simulations.
+Table~\ref{table:sim_details} for the full list of simulations conducted for this study and links to the openly available trajectories. Data not mentioned here was obtained by analysis pre-existing trajectories in the NMRlipids databank.
 
-CHARMM-Drude 2023 force field parameters are currently not integrated into CHARMM-GUI. Therefore, the starting structures for these simulations with NaCl and CaCl$_{2}$ have been generated following the instructions in the original CHARMM-Drude 2023 paper~\cite{yu2023drude} using CHARMM~\cite{brooks2009charmm} and the last frame of 200~ns long CHARMM36 simulations. CHARMM-Drude 2023 simulations without any ions have been directly obtained from Zenodo. Please see Table~\ref{table:sim_details} for the full list of used simulations and their locations. All simulations were stored in the NMRlipids databank~\cite{Databank}.
 
-For both systems, a dual Langevin thermostat was employed to keep the Drude particles and the rest of the system at 1.0~K and 303~K, respectively. A Drude-hardwall of 0.02~nm was used to keep the Drude particles close to their parent atoms. Semi-isotropic Monte Carlo barostat was used to couple pressure to 1~bar independently in membrane plane and normal directions. %while the pressure fluctuations along the $xy$-plane were coupled. A constant surface tension of 0.0~dyne/cm was applied throughout the simulations. 
-Bonds containing the hydrogens have been constrained. For CHARMM-Drude 2017, particle mesh Ewald was used to compute the Coulomb interactions. van der Waals interactions have been cut to 0 between 1.0~nm and 1.2~nm using a switching function. For the CHARMM-Drude 2023, Lennard-Jones particle-mesh Ewald (LJ-PME) method have been used to compute the long-range dispersions~\cite{wennberg2013lennard}. Simulation frames have been saved in every 10~ps.
+CHARMM-Drude2017 simulations were performed with OpenMM 7.5.0~\cite{eastman2017openmm} using parameters extracted with \textit{Membrane Builder}~\cite{wu2014charmm,jo2009charmm,jo2007automated,lee2018charmm} and \textit{Drude Prepper}~\cite{kognole2022charmm} from CHARMM-GUI~\cite{jo2008charmm,lee2016charmm}. Before starting the simulations, membrane structures were equilibrated for 200~ns using the non-polarizable CHARMM36 force field~\cite{klauda2010update}, and the last frames of these simulations were used to generate the starting structures for the polarizable force field simulations.
+
+CHARMM-Drude 2023 force field parameters are currently not integrated into CHARMM-GUI. Therefore, the simulation setups with NaCl and CaCl$_{2}$ have been generated following the instructions in the original CHARMM-Drude 2023 paper~\cite{yu2023drude} using CHARMM~\cite{brooks2009charmm} and the last frame of 200~ns long CHARMM36 simulations. CHARMM-Drude 2023 simulations without any ions have been directly obtained from Zenodo~\cite{richard_m_venable_2023_7872447, richard_m_venable_2023_7871949}. 
+
+A dual Langevin thermostat was employed to keep the Drude particles and the rest of the system at 1.0~K and 303~K, respectively. A Drude-hardwall of 0.02~nm was utilized to keep the Drude particles close to their parent atoms. Semi-isotropic Monte Carlo barostat was used to couple pressure to 1~bar independently in membrane plane and normal directions. %while the pressure fluctuations along the $xy$-plane were coupled. A constant surface tension of 0.0~dyne/cm was applied throughout the simulations. 
+Bonds containing the hydrogens were constrained. For CHARMM-Drude 2017, particle mesh Ewald was used to compute the Coulomb interactions. van der Waals interactions have been cut to 0 between 1.0~nm and 1.2~nm using a switching function. For the CHARMM-Drude 2023, Lennard-Jones particle-mesh Ewald (LJ-PME) method was used to compute the long-range dispersions~\cite{wennberg2013lennard}. Simulation frames have been saved in every 10~ps.
 
 
 \subsection{Simulations with AMOEBA parameters}
 
-AMOEBA force field parameters for OpenMM were obtained from GitHub~\cite{amoebagithub,klesse2020induced}. All AMOEBA simulations have been run on OpenMM 7.1.1~\cite{eastman2017openmm}. The same initial structures as the CHARMM-Drude simulations have been used to create the simulation setups. A multi-time step Langevin integrator was used to iterate the bonded and remaining interactions in every 0.5~fs and 2.0~fs, respectively. A non-bonded cutoff of 1.2~nm has been applied while semi-isotropic Monte Carlo barostat was used to couple pressure to 1~bar independently in membrane plane and normal directions.
+AMOEBA force field parameters for OpenMM were obtained from GitHub~\cite{amoebagithub,klesse2020induced}. All AMOEBA simulations have been run on OpenMM 7.1.1~\cite{eastman2017openmm}. The same initial structures as the CHARMM-Drude simulations have been used to create the simulation setups. A multi-time step Langevin integrator was used to iterate the bonded and non-bonded interactions in every 0.5~fs and 2.0~fs, respectively. A non-bonded cutoff of 1.2~nm has been applied while semi-isotropic Monte Carlo barostat was used to couple pressure to 1~bar independently in membrane plane and normal directions.
 %keeping the pressure at 1~bar using a Monte Carlo barostat. Pressure fluctuations in the $xy$-plane has been coupled using a semi-isotropic pressure coupling and a constant surface tension at 0.0~dyn/cm has been applied throughout the simulations. 
 Simulation frames have been saved in every 10~ps. Further simulations details can be found in the input files of the respective simulations (Table~\ref{table:sim_details})
-All simulations were stored in the NMRlipids databank~\cite{Databank}.
+
 
 \subsection{Analysis of simulations}
+ All simulations were first uploaded to the NMRlipids databank~\cite{Databank}. 
+Area per lipids, X-ray scattering form factors, and order parameters ($S_{CH}$) are automatically calculated by the NMRLipids Databank~\cite{Databank} and were extracted from therein. Quality evaluation metrics were quantified as detailed in the NMRlipids databank~\cite{Databank} with the exception that POPC simulations at 303\,K were coupled with the experimental data measured at 300\,K, while in the NMRlipids databank simulations are coupled to experiments with the maximum temperature difference of two degrees. Shortly, order parameter qualities, $P^{\mathrm{headgroup}}$, $P^{sn-1}$, and $P^{sn-2}$, presents an average probability for order parameters of a given segment to locate within experimental values, taking the error bars of both values into the account. Qualities of SAXS form factors, $FF_{q}$, are measured from the distance between first form factor minimum in simulated vs. experimetal curve to avoid the effects from the simulation size dependency of the SAXS data.
+%~\cite{Databank} one should focus on the extrema $q_{z}$[\AA$^{-1}$] when comparing the simulated and experimental data. In particular $FFq$ only measures the difference between the first minima of the simulated and experimental curves. 
+Note that in quantifying the bilayer electron densities for calculation of SAXS curves  the NMRlipids databank analysis algorithm places electrons as point charges at the atom centers without considering redistribution of charge density due to the polarizability. Nevertheless, we expect that this approximation does not have significant effect on the resulting SAXS form factors.
 
-Area per lipids, X-ray scattering form factors, and $S_{CH}$ order parameters automatically calculated by the NMRLipids Databank~\cite{Databank} were used. The $R_{1}$ rates and effective correlation times, along with the accompanying error estimates, are quantified from the trajectories as elaborated in Ref.~\citenum{Antila2021}. In-house python script available at XXX was used for this purpose. Source codes for all scripts and a detailed methodological explanation of the computed values are available in the referenced cited herein.
+The $R_{1}$ rates and effective correlation times, along with the accompanying error estimates, are quantified from the trajectories as elaborated in Ref.~\citenum{Antila2021}. In-house python script available at XXX was used for this purpose. Source codes for all scripts and a detailed methodological explanation of the computed values are available in the referenced cited herein.
 
 \begin{comment}
 Order parameters are calculated using the script "OrderParameters.py" under\\ "https://github.com/batukav/NMRlipidsVIpolarizableFFs/tree/master/scripts". \\
@@ -343,7 +409,7 @@ This project is performed using the "NMRLipids Databank" format and all related 
 	Lipid/ion                & force field  & Ion (M) & N$_{l}$ & N$_{w}$ & N$_{ion}$ & T (K) & t$_{sim}$ (ns) & t$_{analysis}$ (ns) & files \\ \hline
 \multirow{2}{*}{POPC}            & Drude2017 & 0      & 144       & 6400       & 0         & 303    & 500              & 400         &          \cite{kav_batuhan_2021_7607436}    \\ 
                                  & Drude2023 & 0      & 72       & 2239       & 0         & 303      & 300              & 200         &          \cite{kav_batuhan_2023_7916287, richard_m_venable_2023_7871949}    \\ \hline
-\multirow{3}{*}{POPE}                              & Drude2017 & 0      & 144       & 6400       & 0         & 303    & 350              & 300         &          \cite{kav_batuhan_2021_7604627}    \\                                            & Drude2023 & 0       & 72        & 2304      &  0         & 303    & 300             & 200         &           \cite{richard_m_venable_2023_7872447,kav_batuhan_2023_7916494} \\
+\multirow{3}{*}{POPE}                              & Drude2017 & 0      & 144       & 6400       & 0         & 308.15    & 350              & 300         &          \cite{kav_batuhan_2021_7604627}    \\                                            & Drude2023 & 0       & 72        & 2304      &  0         & 303    & 300             & 200         &           \cite{richard_m_venable_2023_7872447,kav_batuhan_2023_7916494} \\
                                                   & AMOEBA     & 0       & 72        & 2880      &  0        & 303     & 305.94          & 305.94      & \cite{kav_batuhan_2023_7622838} \\ \hline
 	\multirow{5}{*}{POPC:NaCl}        & Drude2017 & 0.350   & 144      & 6400     & 41         & 303   & 500             & 400                  & \cite{kav_batuhan_2020_7586915}   \\
 				  & Drude2017 & 0.450   & 144      & 6400     & 51         & 303   & 500             & 400                  & \cite{kav_batuhan_2020_7591753}   \\
@@ -369,6 +435,7 @@ DOPC           & AMOEBA   & 0 & 72 & 2880 & 0 & 303 & 201.61 & 201.61 & \cite{ka
 \caption{Systems simulated for this work. Column N$_l$ gives the number of lipids, N$_w$ gives the number of water molecules, T(K) denotes the temperature in kelvins. Simulated time is listed in column t$_{sim}$ and time used for analysis in t$_{analysis}$. Column "files" gives the reference to open access simulation data.}
 \label{table:sim_details}
 \end{table}
+\todo{check the simualation settings (especially the temperature}
 %\end{adjustbox}
 
 
@@ -379,6 +446,7 @@ DOPC           & AMOEBA   & 0 & 72 & 2880 & 0 & 303 & 201.61 & 201.61 & \cite{ka
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{acknowledgement}
 
+J.J.M. thanks Huiying Chu (from the Li lab) for technical discussions and Sameer Varma for useful suggestions.
 
 \end{acknowledgement}
 
@@ -396,5 +464,25 @@ DOPC           & AMOEBA   & 0 & 72 & 2880 & 0 & 303 & 201.61 & 201.61 & \cite{ka
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \bibliography{references.bib}
+
+\section{Supplementary figures}
+
+\begin{figure}[!h]
+    \centering
+    %\includegraphics{Figures/order_parameters.png}
+    \includegraphics[width=0.8\textwidth]{Figures/quality_Drude2023_replicas.pdf}
+    \caption{X-ray scattering form factors, and C-H bond order parameters for headgroup and glycerol backbone, and acyl chains (from top to bottom) compared between simulations and experiments using the NMRlipids databank. The atom labelling is as depicted in Fig.~\ref{fig:molecules}.}
+    \label{fig:order_parameters_replicas}
+
+\end{figure}
+
+\begin{figure}[!hbt]
+	\centering
+	\includegraphics{Figures/dihedral_distributions_without_ions.eps}
+	\caption{The distributions of the torsion angles for the head group atoms. For each torsion angle, the upper and lower rows contain the DOPC (AMOEBA) - POPC (Drude/Drude2023) and POPE lipids, respectively.}
+	\label{fig:dihedral_no_salt}
+\end{figure}
+
+
 
 \end{document}
