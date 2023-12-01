@@ -36155,9 +36155,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.12374369"
-     inkscape:cx="2905.1986"
-     inkscape:cy="2824.3864"
+     inkscape:zoom="0.35000001"
+     inkscape:cx="1404.2857"
+     inkscape:cy="3081.4285"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -36208,7 +36208,7 @@
          x="-305.26425"
          y="356.40451"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:11.2889px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;text-anchor:middle;stroke-width:0.282222px"
-         id="tspan16842">CHARMM-Drude POPC</tspan></text>
+         id="tspan16842">CHARMM-Drude2017 POPC</tspan></text>
     <g
        id="g170360"
        inkscape:label="HG"
@@ -42385,7 +42385,7 @@
          x="-319.86719"
          y="1137.261"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:11.2889px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:center;text-anchor:middle;stroke-width:0.282222px"
-         id="tspan16842-1">CHARMM-Drude POPE</tspan></text>
+         id="tspan16842-1">CHARMM-Drude2017 POPE</tspan></text>
     <g
        id="g169529"
        inkscape:label="HG"
